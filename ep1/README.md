@@ -1,5 +1,7 @@
 # Episode 1: Musical Notes & Computation
 
+[Watch the episode here!](https://youtu.be/BrxO-Lssnjg)
+
 [Subscribe to the YouTube channel!](https://www.youtube.com/channel/UCrZNf0XkxtXE0tsy1y2RT0w).
 
 This is the code for the performance at the end of the first episode.
