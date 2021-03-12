@@ -7,7 +7,7 @@
 
 #define IN_PORT 12345
 // This needs to coincide with SuperCollider settings.
-#define OUT_PORT 57121
+#define OUT_PORT 57120
 #define HOST "localhost"
 
 #define LINE_SPEED 2
