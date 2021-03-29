@@ -83,7 +83,10 @@ void ofApp::setup(){
   box2d.setFPS(60.0);
   box2d.registerGrabbing();
   anchor.setPhysics(0.0, 0.0, 0.0);
-  anchor.setup(box2d.getWorld(), ofGetWidth()*3/8, ofGetHeight()*5/8, ANCHOR_RADIUS);
+  if (DOING_INTRO)
+    anchor.setup(box2d.getWorld(), ofGetWidth()*3/8, ofGetHeight()*5/8, ANCHOR_RADIUS);
+  else
+    anchor.setup(box2d.getWorld(), ofGetWidth()/2, ofGetHeight()/2, ANCHOR_RADIUS);
   // We start with a single pendulum.
   Note note;
   note.pitch = -1;
@@ -247,7 +250,7 @@ void ofApp::dropPendulumNote(int pitch) {
 }
 
 void ofApp::addNewLetter(int pitch) {
-  if (pitch < 62) return;
+  if (pitch < 62 || !DOING_INTRO) return;
   for (int i = 0; i < drawLetter.size(); ++i) {
     if (drawLetter[i]) continue;
     drawLetter[i] = true;

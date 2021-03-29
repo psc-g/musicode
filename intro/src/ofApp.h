@@ -33,6 +33,7 @@
 #define SPIN_DELTA 5.0
 #define ROTATE_STEPS 100
 
+#define DOING_INTRO false
 #define VERBOSE false
 
 struct BezierPoints {
