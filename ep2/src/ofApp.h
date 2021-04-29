@@ -6,7 +6,7 @@
 
 #define IN_PORT 12345
 // This needs to coincide with SuperCollider settings.
-#define OUT_PORT 57121
+#define OUT_PORT 57120
 #define HOST "localhost"
 #define GRAVITY 10.0
 #define KEY_SEPARATION 2
@@ -16,7 +16,7 @@
 #define OCTAVE_DELAY 2.0
 #define SCALE_SWITCH_PROBABILITY 0.3
 #define RESET_THRESHOLD 2.0
-#define DO_TRIADS true
+#define DO_TRIADS false
 
 struct PianoKey {
   ofxBox2dRect key;

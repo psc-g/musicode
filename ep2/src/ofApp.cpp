@@ -135,15 +135,23 @@ void ofApp::setupKeyboard() {
 }
 
 void ofApp::addNote(int pitch) {
-  if (pitch < 36) {
-    int newPitch = pitch - 21;  // Second octave from bottom.
-    sendNote(root, false);
-    root = newPitch;
-    updateOnScale();
-    if (((float) rand() / RAND_MAX) < SCALE_SWITCH_PROBABILITY) {
-      newScale();
+  if (DO_TRIADS) {
+    if (pitch < 36) {
+      int newPitch = pitch - 21;  // Second octave from bottom.
+      sendNote(root, false);
+      root = newPitch;
+      updateOnScale();
+      if (((float) rand() / RAND_MAX) < SCALE_SWITCH_PROBABILITY) {
+        newScale();
+      }
+      updateTriad();
     }
-    updateTriad();
+  } else {
+    int newPitch = pitch - 21;
+    auto keyPos = pianoKeysTop[newPitch].key.getPosition();
+    particleSystem.addParticle(keyPos.x, whiteHeight * 1.1);
+    pianoKeysTop[newPitch].lastDraw = ofGetElapsedTimef();
+    pianoKeysTop[newPitch].active = true;
   }
   pianoKeysBottom[pitch - 21].active = true;
 }
@@ -151,6 +159,7 @@ void ofApp::addNote(int pitch) {
 void ofApp::dropNote(int pitch) {
   // Set active note on keyboard.
   pianoKeysBottom[pitch - 21].active = false;
+  if (!DO_TRIADS) pianoKeysTop[pitch - 21].active = false;
 }
 
 void ofApp::allNotesOff() {
@@ -187,7 +196,14 @@ void ofApp::update() {
     }
   }
   for (uint i = 0; i < 88; ++i) {
-    if (pianoKeysTop[i].inTriad) {
+    if (!DO_TRIADS && pianoKeysTop[i].active) {
+      auto currTime = ofGetElapsedTimef();
+      if (currTime - pianoKeysTop[i].lastDraw > PARTICLE_DELAY) {
+        auto keyPos = pianoKeysTop[i].key.getPosition();
+        particleSystem.addParticle(keyPos.x, whiteHeight * 1.1);
+        pianoKeysTop[i].lastDraw = currTime;
+      }
+    } else if (pianoKeysTop[i].inTriad) {
       auto currTime = ofGetElapsedTimef();
       if (currTime - pianoKeysTop[i].lastDraw > PARTICLE_DELAY) {
         auto keyPos = pianoKeysTop[i].key.getPosition();
@@ -195,7 +211,7 @@ void ofApp::update() {
         pianoKeysTop[i].lastDraw = currTime;
       }
     }
-    if (pianoKeysBottom[i].active && onScale[i]) {
+    if (pianoKeysBottom[i].active && (!DO_TRIADS || onScale[i])) {
       auto pos = pianoKeysBottom[i].key.getPosition();
       auto yPos = std::max(pianoKeysBottom[i].targetY, pos.y - KEY_SEPARATION * 2);
       pianoKeysBottom[i].key.setPosition(pos.x, yPos);
@@ -212,19 +228,21 @@ void ofApp::update() {
     }
   }
   // Update tremoloing triads.
-  if (root < 0) return;
-  float currTime = ofGetElapsedTimef();
-  if (currTime - lastTriadSelect > TRIAD_DELAY) {
-    int selectedNote = rand() % 3;
-    for (uint i = 0; i < 3; ++i) {
-      if (i == selectedNote) sendNote(triad[i], true);
-      else sendNote(triad[i], false);
+  if (DO_TRIADS) {
+    if (root < 0) return;
+    float currTime = ofGetElapsedTimef();
+    if (currTime - lastTriadSelect > TRIAD_DELAY) {
+      int selectedNote = rand() % 3;
+      for (uint i = 0; i < 3; ++i) {
+        if (i == selectedNote) sendNote(triad[i], true);
+        else sendNote(triad[i], false);
+      }
+      lastTriadSelect = currTime;
     }
-    lastTriadSelect = currTime;
-  }
-  if (currTime - lastOctaveSelect > OCTAVE_DELAY) {
-    updateTriad();
-    lastOctaveSelect = currTime;
+    if (currTime - lastOctaveSelect > OCTAVE_DELAY) {
+      updateTriad();
+      lastOctaveSelect = currTime;
+    }
   }
 }
 
@@ -253,7 +271,9 @@ void ofApp::draw() {
     ofSetHexColor(0x000000);
     ofFill();
     pianoKeysBottomBacking[i].key.draw();
-    if (pianoKeysBottom[i].active && onScale[i]) {
+    if (!DO_TRIADS) {
+      ofSetColor(ofColor::white);
+    } else if (pianoKeysBottom[i].active && onScale[i]) {
       ofSetHexColor(keyColours[i]);
     } else if (!onScale[i]) {
       ofSetColor(ofColor::grey);
@@ -275,7 +295,9 @@ void ofApp::draw() {
     ofSetHexColor(0x000000);
     ofFill();
     pianoKeysBottomBacking[i].key.draw();
-    if (pianoKeysBottom[i].active && onScale[i]) {
+    if (!DO_TRIADS) {
+      ofSetColor(ofColor::black);
+    } else if (pianoKeysBottom[i].active && onScale[i]) {
       ofSetHexColor(keyColours[i]);
     } else if (!onScale[i]) {
       ofSetColor(ofColor::grey);
