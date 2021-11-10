@@ -135,7 +135,7 @@ void ofApp::setupKeyboard() {
 }
 
 void ofApp::addNote(int pitch) {
-  if (DO_TRIADS) {
+  if (doTriads) {
     if (pitch < 36) {
       int newPitch = pitch - 21;  // Second octave from bottom.
       sendNote(root, false);
@@ -159,7 +159,7 @@ void ofApp::addNote(int pitch) {
 void ofApp::dropNote(int pitch) {
   // Set active note on keyboard.
   pianoKeysBottom[pitch - 21].active = false;
-  if (!DO_TRIADS) pianoKeysTop[pitch - 21].active = false;
+  if (!doTriads) pianoKeysTop[pitch - 21].active = false;
 }
 
 void ofApp::allNotesOff() {
@@ -196,7 +196,7 @@ void ofApp::update() {
     }
   }
   for (uint i = 0; i < 88; ++i) {
-    if (!DO_TRIADS && pianoKeysTop[i].active) {
+    if (!doTriads && pianoKeysTop[i].active) {
       auto currTime = ofGetElapsedTimef();
       if (currTime - pianoKeysTop[i].lastDraw > PARTICLE_DELAY) {
         auto keyPos = pianoKeysTop[i].key.getPosition();
@@ -211,7 +211,7 @@ void ofApp::update() {
         pianoKeysTop[i].lastDraw = currTime;
       }
     }
-    if (pianoKeysBottom[i].active && (!DO_TRIADS || onScale[i])) {
+    if (pianoKeysBottom[i].active && (!doTriads || onScale[i])) {
       auto pos = pianoKeysBottom[i].key.getPosition();
       auto yPos = std::max(pianoKeysBottom[i].targetY, pos.y - KEY_SEPARATION * 2);
       pianoKeysBottom[i].key.setPosition(pos.x, yPos);
@@ -228,7 +228,7 @@ void ofApp::update() {
     }
   }
   // Update tremoloing triads.
-  if (DO_TRIADS) {
+  if (doTriads) {
     if (root < 0) return;
     float currTime = ofGetElapsedTimef();
     if (currTime - lastTriadSelect > TRIAD_DELAY) {
@@ -271,7 +271,7 @@ void ofApp::draw() {
     ofSetHexColor(0x000000);
     ofFill();
     pianoKeysBottomBacking[i].key.draw();
-    if (!DO_TRIADS) {
+    if (!doTriads) {
       ofSetColor(ofColor::white);
     } else if (pianoKeysBottom[i].active && onScale[i]) {
       ofSetHexColor(keyColours[i]);
@@ -295,7 +295,7 @@ void ofApp::draw() {
     ofSetHexColor(0x000000);
     ofFill();
     pianoKeysBottomBacking[i].key.draw();
-    if (!DO_TRIADS) {
+    if (!doTriads) {
       ofSetColor(ofColor::black);
     } else if (pianoKeysBottom[i].active && onScale[i]) {
       ofSetHexColor(keyColours[i]);
@@ -329,7 +329,7 @@ void ofApp::draw() {
 }
 
 void ofApp::updateTriad() {
-  if (!DO_TRIADS) return;
+  if (!doTriads) return;
   for (uint i = 0; i < 3; ++i) sendNote(triad[i], false);
   int selectedOctave = rand() % 5 + 1;  // Don't use first octave.
   sendNote(root, true);
@@ -347,14 +347,16 @@ void ofApp::updateTriad() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-  if (key == 't') ofToggleFullscreen();
-  if (key == 'r') reset();
-  if(key == 'a') {
+  if (key == 't') {
+    ofToggleFullscreen();
+  } else if (key == 'r') {
+    reset();
+  } else if (key == 'd') {
+    doTriads != doTriads;
+  } else if(key == 'a') {
     addNote(62);
   } else if (key == 's') {
     addNote(64);
-  } else if (key == 'd') {
-    addNote(66);
   } else if (key == 'f') {
     addNote(67);
   } else if (key == 'g') {

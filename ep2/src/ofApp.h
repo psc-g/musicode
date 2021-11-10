@@ -16,7 +16,6 @@
 #define OCTAVE_DELAY 2.0
 #define SCALE_SWITCH_PROBABILITY 0.3
 #define RESET_THRESHOLD 2.0
-#define DO_TRIADS false
 
 struct PianoKey {
   ofxBox2dRect key;
@@ -35,7 +34,7 @@ public:
   void setup();
   void update();
   void draw();
-  void reset() { }
+  void reset() { particleSystem.clearParticles(); }
 
   void addNote(int pitch);
   void dropNote(int pitch);
@@ -79,4 +78,5 @@ private:
   std::string bitString;
   bool onScale[88];
   ofTrueTypeFont font;
+  bool doTriads = false;
 };

@@ -161,9 +161,10 @@ void Echo::startPlayback(float t, bool reverse, bool negative) {
       }
       if (negative) {
         // Hardcoded, parameterize.
-        // float pivot = 63.5;  // C pivot
+        float pivot = 63.5;  // C pivot
+        // float pivot = 64.5;  // C# pivot
         // float pivot = 68.5;  // F pivot
-        float pivot = 58.5;  // G pivot
+        // float pivot = 58.5;  // G pivot
         playedMeshes[i].note.pitch = int(pivot * 2) - playedMeshes[i].note.pitch;
       }
     }
